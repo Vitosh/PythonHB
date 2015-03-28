@@ -6,6 +6,7 @@
 
 3. stage files to add
 ==> git add test.py
+==> git add .
 
 4. show status again
 ==> git status

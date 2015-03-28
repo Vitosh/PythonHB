@@ -1,0 +1,16 @@
+{
+  "name": "HackBulgaria-NodeJS-Programs-Puzzle",
+  "version": "0.0.1",
+  "dependencies": {
+    "underscore": "^1.6.0",
+    "express": "~4.12.3"
+  },
+  "description": "ERROR: No README data found!",
+  "main": "program.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "BSD-2-Clause"
+}

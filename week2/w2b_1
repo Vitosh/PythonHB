@@ -1,0 +1,41 @@
+import sys
+
+
+# def has_arguments(count):
+#     return len(sys.argv[1:]) >= count
+
+
+# def main():
+#     if has_arguments(1):
+#         filename = sys.argv[1]
+#         print(filename)
+
+#     else:
+#         print("There are no arguments")
+
+
+# if __name__ == "__main__":
+#     printFunction(1, 2, 3)
+
+
+def printFunction():
+    print(sys.argv[0])
+    print(sys.argv[1])
+    print(sys.argv[2])
+
+    # iLen = len(sys.argv[1:])
+    # lList = sys.argv[1:]
+
+    # for z in lList:
+    #     content = z.read()
+    #     print(content)
+
+    #i = 0
+    #sResult = ""
+    # while i < iLen:
+    #     sFileName = myargs[i]
+    #     file = open(sFileName, "r")
+    #     content = file.read()
+    #     print(content)
+    #     file.close
+    #     i += 1

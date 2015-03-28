@@ -63,6 +63,10 @@ https://github.com/Vitosh/TestRepo/commits
 17. Cloning the repo
 ==> git clone git@github~
 
+18. Remove directory from git and local
+==> git rm -r one-of-the-directories
+==> git commit -m "Remove duplicated directory"
+==> git push origin master
 
 
 

@@ -1,0 +1,19 @@
+Preferences>SyntaxSpecific>User
+Save AS:
+
+{
+	"color_scheme": "Packages/Color Scheme - Default/Monokai Bright.tmTheme",
+	"font_size": 11,
+	"wrap_width":1000,
+	"tab_size":4,
+	"translate_tabs_to_spaces": true,
+	"pep8": true,
+	"pep8_ignore":["E501","W191"],
+	"ignored_packages":
+	[
+		"Vintage"
+	]
+
+}
+
+

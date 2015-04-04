@@ -1,0 +1,1 @@
+"{ZZZZZ: [OOOOOO], Micha: [Queen], Georg: [Peter, Lilia, Queen], Queen: [Georg, Romeo, Micha], Peter: [Georg, Teodo], Lilia: [Georg], Teodo: [OOOOOO, Peter], Romeo: [Queen], OOOOOO: [ZZZZZ, Teodo]}"

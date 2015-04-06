@@ -1,0 +1,16 @@
+ADT
+BFS
+@staticmethod
+
+pip? Install pip for 2.7    
+sudo apt-get install python3-pip
+pip --version
+pip3 --version
+
+
+>>pip3 install requests
+>>r = requests.get("http://www.vitoshacademy.com")
+>>r.status_code
+
+*arg
+**kwargs

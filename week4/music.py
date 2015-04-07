@@ -1,4 +1,4 @@
-import requests
+import random
 
 
 class Songs:
@@ -18,12 +18,35 @@ class Songs:
     def album(self):
         return self.__album
 
-    def length(self, seconds=False):
+    def length(self, seconds=False, minutes=False, hours=False):
+        sTotal = self.__length.split(":")
+
         if seconds:
-            sSeconds = self.__length.split(":")
-            iMinutes = int(sSeconds[0]) * 60
-            iSeconds = int(sSeconds[1])
+            if len(sTotal) == 3:
+                iHours = int(sTotal[0]) * 3600
+                iMinutes = int(sTotal[1]) * 60
+                iSeconds = int(sTotal[2])
+                return iHours + iMinutes + iSeconds
+
+            iMinutes = int(sTotal[0]) * 60
+            iSeconds = int(sTotal[1])
             return iMinutes + iSeconds
+
+        if minutes:
+            if len(sTotal) == 3:
+                iHours = int(sTotal[0]) * 60
+                iMinutes = int(sTotal[1])
+                return iHours + iMinutes
+
+            iMinutes = int(sTotal[0])
+            return iMinutes
+
+        if hours:
+            if len(sTotal) == 3:
+                iHours = int(sTotal[0])
+                return iHours
+            return 0
+
         return self.__length
 
     def __str__(self):
@@ -62,9 +85,32 @@ class Playlist:
 
     def __init__(self, name, repeat=False, shuffle=False):
         self.__music = {}
+        self.__musicByOrder = []
         self.__name = name
         self.__repeat = repeat
         self.__shuffle = shuffle
+        self.__played = []
+    
+    def artists(self):
+        self.__histogram = {}
+        for song in self.__music:
+            self.__histogram[song.artist()] = 0
+
+        for song in self.__music:
+            self.__histogram[song.artist()] += 1
+
+        return self.__histogram
+
+    def total_length(self):
+        iSeconds = 0
+        for song in self.__music:
+            iSeconds += song.length(seconds=True)
+        iMinutes = iSeconds // 60
+        iHours = iMinutes // 60
+        return "%02d:%02d:%02d" % (iHours, iMinutes % 60, iSeconds % 60)
+
+    def show_playlist(self):
+        return self.__music
 
     def add_song(self, song):
         if song in self.__music:
@@ -74,24 +120,10 @@ class Playlist:
     def remove_song(self, song):
         if song not in self.__music:
             raise SongIsNotPresent
-        iIndex = self.__music.index(song)
-        self.__music.pop(iIndex)
+        del self.__music[song]
 
     def __repr__(self):
+        return str(self)
+
+    def __str__(self):
         return str(self.__music)
-
-newSong1 = Songs("Blue Marry", "Unknown Artist", "Unknown Album", "3:42")
-newSong2 = Songs("Red Marry", "Unknown Artist2", "Unknown Album2", "13:42")
-newSong3 = Songs("Funky Marry", "Unknown Artist3", "Unknown Album3", "1:42")
-
-print(str(newSong1))
-print(newSong1.length(True))
-print(newSong1.length())
-
-code_songs = Playlist(name="Code", repeat=True, shuffle=True)
-code_songs.add_song(newSong1)
-code_songs.add_song(newSong2)
-code_songs.add_song(newSong3)
-print(code_songs)
-code_songs.remove_song(newSong2)
-print(code_songs)

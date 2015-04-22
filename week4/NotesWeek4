@@ -14,3 +14,33 @@ pip3 --version
 
 *arg
 **kwargs
+
+>>which python3.4
+/usr/bin/python3.4PATH
+
+>>echo $PATH
+>>echo $PATH | grep "/usr/bin"
+
+pip freeze > requirements.txt
+pip install -r requirements.txt
+>> sudo apt-get install python-virtualenv
+source music-library/bin/activate
+deactivate -> going away from the virtual environment
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+http://docs.python-guide.org/en/latest/dev/virtualenvs/
+1. Create a virtual environment for a project:
+
+>>$ cd my_project_folder
+>>$ virtualenv venv
+NOTE: "venv" is the name of the virtual environment
+Run a Python interpreter of your choice
+>>$ virtualenv -p /usr/bin/python2.7 venv
+To activate:
+>>$ source venv/bin/activate
+then you may install requests:
+>>deactivate
+>>pip freeze > requirements.txt
+>>cat requirements.txt
+>>pip install -r requirements.txt
+

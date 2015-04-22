@@ -53,7 +53,8 @@ class Songs:
         return "{} - {} from {} - {}".format(self.__title, self.__artist, self.__album, self.__length)
 
     def __eq__(self, other):
-        return self.__title == other.__title and self.__artist == other.__artist and self.__album == other.__album
+        # return self.__title == other.__title and self.__artist == other.__artist and self.__album == other.__album
+        return self.__dict__ == other.__dict__
 
     def __hash__(self):
         return hash(str(self))

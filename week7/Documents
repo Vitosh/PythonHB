@@ -1,0 +1,51 @@
+Request - Response model
+curl -> console HTTTP  client
+
+къде и какъв ресурс искаме? (/api/students) 
+кои сме ние?
+от какво разбираме?
+какво искаме? (get, post, put, delete)
+
+nc -l 8000
+telnet google.bg 80
+
+~telnet google.bg 80
+Trying 216.58.208.99...
+Connected to google.bg.
+Escape character is '^]'.
+GET / HTTP/1.1
+Host: google.bg
+
+curl -I http://www.google.com (връща само headers, без съдържание)
+
+import requests
+r = requests.get("download.bg")
+r.headers["Server"]
+
+chrome user agent strings
+headers = {}
+headers["User-Agent"] = chrome user agent strings
+requests.get("www....", headers = headers)
+
+
+
+
+
+
+
+
+
+
+
+while str(r.status_code).startswith("3"):
+	r = requests.head(r.headers("location")
+
+
+r = requests.head("www.", allow_redirects = True)
+r.status_code
+>>200
+r.history
+r.wurl
+
+
+

@@ -4,6 +4,7 @@ import copy
 
 class Strings:
     FOLLOWERS = "https://api.github.com/users/{}/followers?client_id=926275e6df122f430b26&client_secret=9fcec76b0044441be11969aa391a217a3f87018c"
+    USER = "https://api.github.com/users/{}?client_id=926275e6df122f430b26&client_secret=9fcec76b0044441be11969aa391a217a3f87018c"
     PRINT_FOLLOWERS = "The followers of {} are {}"
     PRINT_FOLLOWING = "The user {} follows {}"
     LOGIN = "login"
@@ -15,24 +16,23 @@ class DirectGraph():
 
     def __init__(self, userName):
         self.name = userName
-        self.GeneralDictionary = {}
         self.ListOfVisitedUsers = []
+        self.data = {}
 
     def get_data_type(self, dataType):
-        data = {}
 
         for user in self.ListOfVisitedUsers:
-            data[user] = self.get_data(user, dataType)
-        return data
+            userNameUrl = requests.get(self.make_url(user))
+            userNameJson = userNameUrl.json()
+            try:
+                dataItem = userNameJson[dataType]
+            except Exception:
+                pass
+            if dataItem != "":
+                self.data[user] = dataItem
 
-    def build_network_with_followers(self):
-
-        self.GeneralDictionary = {}
-        while len(self.ListOfVisitedUsers) > 0:
-            nextUser = (self.ListOfVisitedUsers).pop(0)
-            nextUserFollowers = self.get_followers(nextUser)
-            self.GeneralDictionary[nextUser] = nextUserFollowers
-        return self.GeneralDictionary
+    def make_url(self, userName):
+        return Strings.USER.format(userName)
 
     def build_network(self, user, level):
 
@@ -59,27 +59,12 @@ class DirectGraph():
             level -= 1
         return self.ListOfVisitedUsers
 
-    def print_dictionary(self):
-        for key in sorted(self.GeneralDictionary):
-            print("{} : {}".format(key, self.GeneralDictionary[key]))
-
-    def get_data(self, userName, dataType):
-        userNameUrl = requests.get(self.make_url_followers(userName))
-        userNameJson = userNameUrl.json()
-        userNameFollowers = [followers[dataType]for followers in userNameJson]
-        return userNameFollowers
-
     def get_followers(self, userName):
         userNameUrl = requests.get(self.make_url_followers(userName))
         userNameJson = userNameUrl.json()
-        userNameFollowers = [followers["login"]for followers in userNameJson]
+        userNameFollowers = [followers[Strings.LOGIN]
+                             for followers in userNameJson]
         return userNameFollowers
-
-    def add_edge(self, node_a, node_b):
-        self.GeneralDictionary[node_a] = node_b
-
-    def get_neighbours_for(self, node):
-        return self.GeneralDictionary[node]
 
     def make_url_followers(self, userName):
         return Strings.FOLLOWERS.format(userName)
@@ -88,8 +73,18 @@ class DirectGraph():
 def startMe():
     user = "vitosh"
     graph = DirectGraph(user)
-    graph.build_network(user, 2)
-    print(graph.get_data_type(Strings.EMAIL))
+    graph.build_network(user, 3)
+    graph.get_data_type(Strings.BLOG)
 
+    with open('blog.txt', 'w') as outfile:
+        working_file = graph.data.values()
+        myLength, currentNumber = len(working_file), 0
+        for address in working_file:
+            if (address):
+                outfile.write("{}\n".format(address))
+                print("{0:.0%}".format(currentNumber / myLength))
+            currentNumber += 1
+        outfile.close
+    print("Finished")
 if __name__ == '__main__':
     startMe()

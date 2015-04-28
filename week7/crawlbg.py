@@ -39,32 +39,45 @@ for line in myList:
 # myFile = open('myFile', 'w')
 # myFile.write('\n'.join(myImporvedList))
 # myFile.close()
-counter = 30
+
+# for line in myImporvedList:
+#     if "apache" in line.lower():
+
 
 for line in myImporvedList:
     try:
-        r = requests.get(line, headers=myHeaders, timeout=0.3)
-        serverType = r.headers["Server"]
-        # print(serverType)
+        r = requests.head(line, headers=myHeaders, timeout=0.1)
+        serverType = r.headers["server"]
+
+        if "apache" in serverType.lower():
+            serverType = "apache"
+
+        elif "nginx" in serverType.lower():
+            serverType = "nginx"
 
         if serverType not in myDictionary:
             myDictionary[serverType] = 1
-            # print(myDictionary)
-
         else:
             myDictionary[serverType] += 1
-        counter -= 1
 
     except Exception as e:
         pass
-        # print(repr(e))
-    if (counter == 0):
-        break
 
-# print(dict(sorted(myDictionary.items())))
+myFile = open('myFile', 'w')
 
-plt.bar(range(len(myDictionary)), myDictionary.values(), align='center')
-plt.xticks(range(len(myDictionary)), myDictionary.keys())
-plt.show()
+for item in sorted(myDictionary):
+    myFile.write("{} {}\n".format(item, myDictionary[item]))
+myFile.close()
 
+keys = list(myDictionary.keys())
+values = list(myDictionary.values())
 
+X = list(range(len(keys)))
+
+plt.bar(X, list(myDictionary.values()), align="center")
+plt.xticks(X, keys)
+
+plt.title(".bg servers")
+plt.xlabel("Server")
+plt.ylabel("Count")
+plt.savefig("histogram.png")

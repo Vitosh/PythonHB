@@ -1,83 +1,116 @@
 from bs4 import BeautifulSoup
 import requests
-import matplotlib.pyplot as plt
-
-myHeaders = {}
-ua1 = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
-ua2 = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.1 Safari/537.36"
-ua3 = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2227.0 Safari/537.36"
-ua4 = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2226.0 Safari/537.36"
-ua5 = "Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2225.0 Safari/537.36"
-ua6 = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36"
-ua7 = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1985.67 Safari/537.36"
-ua8 = "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.2117.157 Safari/537.36"
-
-myHeaders["User-Agent"] = ua1
-
-webSite = 'http://register.start.bg'
-r = requests.get(webSite, headers=myHeaders)
+from urllib.parse import urlparse
+import sqlite3
+import os.path
 
 
-mySoup = BeautifulSoup(r.text)
-myList = []
-myImporvedList = []
-myDictionary = {}
+def generate_table():
 
-for link in mySoup.find_all('a'):
-    if (link.get('href') is not None
-            and len(link.get('href')) > 8
-            and link.get('href')[:1] != "/"
-            and "javascript" not in link.get('href')):
+    connection = sqlite3.connect("servers.db")
+    cursor = connection.cursor()
 
-        myList.append(link.get('href'))
+    create_users_table = """CREATE TABLE IF NOT EXISTS
+                        server100 (id INTEGER PRIMARY KEY, webAddress TEXT, serverType TEXT, headers TEXT, accessedFrom TEXT);
+                        """
+    delete_data = """DELETE FROM server100;"""
 
-for line in myList:
-    if (line[:12] == "link.php?id="):
-        line = webSite + "/" + line
-    myImporvedList.append(line)
+    cursor.execute(create_users_table)
+    cursor.execute(delete_data)
+    connection.commit()
 
-# myFile = open('myFile', 'w')
-# myFile.write('\n'.join(myImporvedList))
-# myFile.close()
+    myHeaders = {}
+    ua1 = "Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36"
 
-# for line in myImporvedList:
-#     if "apache" in line.lower():
+    myHeaders["User-Agent"] = ua1
+
+    webSite = "http://register.start.bg"
+    r = requests.get(webSite, headers=myHeaders)
+
+    mySoup = BeautifulSoup(r.text)
+    myList = []
+    myImporvedList = []
+
+    for link in mySoup.find_all('a'):
+        if (link.get('href') is not None
+                and len(link.get('href')) > 8
+                and link.get('href')[:1] != "/"
+                and "javascript" not in link.get('href')):
+
+            myList.append(link.get('href'))
+
+    for line in myList:
+        ok = True
+        if (line[:12] == "link.php?id="):
+            line = webSite + "/" + line
+        try:
+            r = requests.head(line, headers=myHeaders, timeout=3)
+
+            if (r.status_code != 200):
+                line = r.headers["location"]
+
+            line = urlparse(line)
+            line = line.netloc
+
+        except Exception:
+            ok = False
+
+        if line not in myImporvedList and len(line) > 6 and ok:
+            myImporvedList.append(line)
+
+    for line in myImporvedList:
+        ok = True
+        try:
+
+            if (line[:4] != "http"):
+                line = "http://" + line
+
+            print("Writing {}".format(line))
+
+            r = requests.head(line, headers=myHeaders, timeout=3)
+
+            myAccessedFrom = webSite
+            headers1 = str(r.headers)
+
+            serverType = r.headers["server"]
+
+            if (r.status_code == 200):
+                serverSite = line
+            else:
+                serverSite = r.headers["location"]
+
+        except Exception:
+            ok = False
+
+        if ok:
+            sqlText = """INSERT INTO server100 (webAddress,serverType,headers, accessedFrom)
+                     VALUES (?,?,?,?);"""
+            cursor.execute(
+                sqlText, (serverSite, serverType, headers1, myAccessedFrom))
+            connection.commit()
+
+    cursor.close()
+    connection.close()
+    print("SUCCESS")
 
 
-for line in myImporvedList:
-    try:
-        r = requests.head(line, headers=myHeaders, timeout=0.1)
-        serverType = r.headers["server"]
+def Read_Table(db_name, table_name, column_name):
 
-        if "apache" in serverType.lower():
-            serverType = "apache"
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    db_path = os.path.join(BASE_DIR, db_name)
+    connection = sqlite3.connect(db_path)
+    myList = []
+    cursor = connection.cursor()
+    sql = """SELECT {} FROM {};"""
+    cursor.execute(sql.format(column_name, table_name))
 
-        elif "nginx" in serverType.lower():
-            serverType = "nginx"
+    for row in cursor:
+        myList.append(row[0])
+    print(myList)
 
-        if serverType not in myDictionary:
-            myDictionary[serverType] = 1
-        else:
-            myDictionary[serverType] += 1
 
-    except Exception as e:
-        pass
+var_db_name = "servers.db"
+var_table_name = "server100"
+var_column_name = "webAddress"
 
-myFile = open('myFile', 'w')
-
-for item in sorted(myDictionary):
-    myFile.write("{} {}\n".format(item, myDictionary[item]))
-myFile.close()
-
-keys = list(myDictionary.keys())
-values = list(myDictionary.values())
-
-X = list(range(len(keys)))
-
-plt.bar(X, list(myDictionary.values()), align="center")
-plt.xticks(X, keys)
-
-plt.title(".bg servers")
-plt.xlabel("Server")
-plt.ylabel("Count")
-plt.savefig("histogram.png")
+Read_Table(var_db_name, var_table_name, var_column_name)

@@ -2,17 +2,17 @@ from bs4 import BeautifulSoup
 import requests
 from urllib.parse import urlparse
 import sqlite3
-import os.path
-import datetime
+import matplotlib.pyplot as plt
+import numpy as np
 
 VAR_DB_NAME = "servers.db"
 VAR_TABLE_COLLECTION_NAME = "server100"
 VAR_COLUMN_NAME = "webAddress"
 VAR_TABLE_PASSED_NAME = "passed"
-VAR_COLUMN_DATE = "dateColumn"
+VAR_COLUMN_SERVER_NAME = "serverType"
 
 
-def generate_table(webSite="http://register.start.bg", myImportedList=[]):
+def Generate_Table(webSite="http://register.start.bg", myImportedList=[]):
     Create_Tables(webSite)
 
     connection = sqlite3.connect(VAR_DB_NAME)
@@ -30,7 +30,7 @@ def generate_table(webSite="http://register.start.bg", myImportedList=[]):
 
     for link in mySoup.find_all('a'):
         if (link.get('href') is not None
-                and len(link.get('href')) > 8  # I love magic!
+                and len(link.get('href')) > 8
                 and link.get('href')[:1] != "/"
                 and "javascript" not in link.get('href')):
 
@@ -52,7 +52,6 @@ def generate_table(webSite="http://register.start.bg", myImportedList=[]):
         except Exception:
             ok = False
 
-        # Magic makes me feel good!
         if line not in myImprovedList and len(line) > 6 and ok and line not in myImportedList:
             myImprovedList.append(line)
 
@@ -63,11 +62,7 @@ def generate_table(webSite="http://register.start.bg", myImportedList=[]):
             if (line[:4] != "http"):
                 line = "http://" + line
 
-            print("Writing {}".format(line))
-
             r = requests.head(line, headers=myHeaders, timeout=3)
-
-            headers1 = str(r.headers)
 
             serverType = r.headers["server"]
 
@@ -77,13 +72,15 @@ def generate_table(webSite="http://register.start.bg", myImportedList=[]):
                 serverSite = r.headers["location"]
 
         except Exception:
+            print("Exception - {}".format(line))
             ok = False
 
         if ok:
-            sqlText = """INSERT INTO ? (webAddress,serverType,headers, accessedFrom)
-                     VALUES (?, ?,?,?,?);"""
-            cursor.execute(
-                sqlText, (VAR_TABLE_COLLECTION_NAME, serverSite, serverType, headers1, webSite))
+            print(serverSite)
+            sqlText = """INSERT INTO "{}" (webAddress,serverType, accessedFrom)
+                     VALUES ("{}","{}","{}");""".format(VAR_TABLE_COLLECTION_NAME, serverSite, serverType,  webSite)
+
+            cursor.execute(sqlText)
             connection.commit()
 
     cursor.close()
@@ -91,23 +88,20 @@ def generate_table(webSite="http://register.start.bg", myImportedList=[]):
 
 
 def Create_Tables(website):
-    nowIsTime = datetime.datetime.now()
-
     connection = sqlite3.connect(VAR_DB_NAME)
     cursor = connection.cursor()
 
     create_users_table = """CREATE TABLE IF NOT EXISTS
-                        {} (id INTEGER PRIMARY KEY, {} TEXT, serverType TEXT, headers TEXT, accessedFrom TEXT);
+                        {} (id INTEGER PRIMARY KEY, {} TEXT, serverType TEXT, accessedFrom TEXT);
                         """.format(VAR_TABLE_COLLECTION_NAME, VAR_COLUMN_NAME)
 
     create_visited_table = """CREATE TABLE IF NOT EXISTS
-                        {} (id INTEGER PRIMARY KEY, {} TEXT, {} DATE);
-                        """.format(VAR_TABLE_PASSED_NAME, VAR_COLUMN_NAME, VAR_COLUMN_DATE)
+                        {} (id INTEGER PRIMARY KEY, {} TEXT);
+                        """.format(VAR_TABLE_PASSED_NAME, VAR_COLUMN_NAME)
 
-    add_website = """INSERT INTO {} ({},{}) VALUES ({},{});""".format(
-        VAR_TABLE_PASSED_NAME, VAR_COLUMN_NAME, website, VAR_COLUMN_DATE, nowIsTime)
+    add_website = """INSERT INTO "{}" ("{}") VALUES ("{}");""".format(
+        VAR_TABLE_PASSED_NAME, VAR_COLUMN_NAME, website)
 
-    print(add_website)
     cursor.execute(create_users_table)
     cursor.execute(create_visited_table)
     cursor.execute(add_website)
@@ -120,16 +114,18 @@ def Create_Tables(website):
 
 def Read_Table(db_name, table_name, column_name):
 
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, db_name)
-    connection = sqlite3.connect(db_path)
-    myList = []
+    connection = sqlite3.connect(VAR_DB_NAME)
     cursor = connection.cursor()
+    myList = []
+
     sql = """SELECT {} FROM {};"""
     cursor.execute(sql.format(column_name, table_name))
 
     for row in cursor:
         myList.append(row[0])
+
+    cursor.close()
+    connection.close()
 
     return myList
 
@@ -159,16 +155,72 @@ def Lets_Crawl():
     while siteToCrawl in myCrawledList:
         siteToCrawl = myReadList.pop(0)
 
-    generate_table(siteToCrawl, myReadList)
-
-    print("End of crawling.")
+    Generate_Table(webSite=siteToCrawl, myImportedList=myReadList)
 
 
 def Start(times):
 
-    generate_table()
     for x in range(1, times):
         Lets_Crawl()
         x += 1
 
-Start(10)
+
+def Print_Results(values=2):
+    myReadList = Read_Table(
+        VAR_DB_NAME, VAR_TABLE_COLLECTION_NAME, VAR_COLUMN_SERVER_NAME)
+
+    myDictionary = List_To_Dictionary(myReadList)
+    print(myDictionary.values())
+    x = np.char.array(list(myDictionary.keys()))
+    y = np.array(list(myDictionary.values()))
+
+    colors = ['yellowgreen', 'red', 'gold', 'lightskyblue', 'white', 'lightcoral',
+              'blue', 'pink', 'darkgreen', 'yellow', 'grey', 'violet', 'magenta', 'cyan']
+
+    porcent = 100. * y / y.sum()
+
+    patches, texts = plt.pie(y, colors=colors, startangle=90, radius=1.2)
+    labels = ['{0} - {1:1.2f} %'.format(i, j) for i, j in zip(x, porcent)]
+
+    patches, labels, dummy = zip(
+        *sorted(zip(patches, labels, y), key=lambda x: x[2], reverse=True))
+    plt.legend(patches, labels, fontsize=12)
+
+    plt.show()
+
+
+def List_To_Dictionary(myList):
+    myDictionary = {}
+    servApache = "Apache"
+    servNginx = "Nginx"
+    servMicrosoft = "Microsoft-IIS"
+    servOracle = "Oracle-Application-Server"
+    servTPD = "lighttpd"
+
+    for serverType in myList:
+
+        if servApache.lower() in serverType.lower():
+            serverType = servApache
+
+        elif servNginx.lower() in serverType.lower():
+            serverType = servNginx
+
+        elif servMicrosoft.lower() in serverType.lower():
+            serverType = servNginx
+
+        elif servOracle.lower() in serverType.lower():
+            serverType = servNginx
+
+        elif servTPD.lower() in serverType.lower():
+            serverType = servNginx
+
+        if serverType not in myDictionary:
+            myDictionary[serverType] = 1
+        else:
+            myDictionary[serverType] += 1
+
+    return myDictionary
+
+# Start(10)
+Print_Results()
+print("That's all folks!")

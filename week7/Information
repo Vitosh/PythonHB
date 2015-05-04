@@ -1,0 +1,151 @@
+Request - Response model
+curl -> console HTTTP  client
+
+къде и какъв ресурс искаме? (/api/students) 
+кои сме ние?
+от какво разбираме?
+какво искаме? (get, post, put, delete)
+
+nc -l 8000
+telnet google.bg 80
+
+~telnet google.bg 80
+Trying 216.58.208.99...
+Connected to google.bg.
+Escape character is '^]'.
+GET / HTTP/1.1
+Host: google.bg
+
+
+curl -I http://www.google.com (връща само headers, без съдържание)
+
+import requests
+r = requests.get("download.bg")
+r.headers["Server"]
+
+chrome user agent strings
+headers = {}
+headers["User-Agent"] = chrome user agent strings
+requests.get("www....", headers = headers)
+
+while str(r.status_code).startswith("3"):
+	r = requests.head(r.headers("location")
+
+r = requests.head("www.", allow_redirects = True)
+r.status_code
+>>200
+r.history
+r.wurl
+
+
+HTTP>
+
+архитектура: 1 server => many clients; request-response
+servers: Apache, nginx
+clients: browsers, curl, requests of Python
+server answers only if asked
+
+Requests in HTTP: GET, POST, PUT, DELETE, HEAD
+ip:port -> socket
+
+Headers are in requests and in respones.
+Request Header:
+UserAgent Header -> describe with
+Response Header:
+Content Type -> string description of what our server returns
+contenttype: text\html
+
+status code: 
+==> 200 OK - > OK
+==> 301 - > moved permanently
+Server return url
+==> 302 - > moved temporarily
+==> 403 - > forbidden
+==> 404 - > :)
+==> 500 - > server error
+
+SQL - Structured Query Language:
+
+	 CRUD
+INSERT - Create
+SELECT - Read
+UPDATE - Update
+DELETE - Delete
+
+.tables
+.schema languages
+
+Една база описва 1 проект = {таблици} (множество от таблици)
+1 таблица има схема и име
+1 схема описва колоните на таблицата
+1 колона се описва с име и тип.
+1 ред в 1 таблица е 1 запис
+
+SQL:
+	DDL - Data Definition Language (създаваме таблици, описваме схемите на таблиците) e.g. Create
+	DML - Data Manipulation Language (създаваме нова информация, работи по редове) e.g. Update
+
+	DML:
+		SELECT ... FROM ... WHERE
+		INSERT ... INTO
+		UPDATE ... FROM
+		DELETE ... FROM
+
+
+
+<<users>>
+id,name,email,gender
+1,Ivo,ivo@abv.bg,male
+2,Maria,maria@abv.bg,female
+
+SELECT id,email
+FROM users
+WHERE gender = "female"
+AND
+email LIKE
+"%@abv.bg"
+
+
+Primary Key = 1 колона в 1 таблица
+	Two Rules for Primary Key:
+		A. Unique
+		B. PK auto increment
+
+INSERT
+INTO users (name, email, gender)
+VALUES ("Ivan", "ivan@mail.bg","male")
+
+UPDATE users
+SET gender = "female";
+WHERE id = 3
+
+cursor = db.cursor()
+cursor.execute(sql)
+db.commit()
+
+DROP TABLE tableName;
+
+facctory design pattern:
+db.row_factory = sqlite3.Row
+
+CREATE TABLE students
+	fn TEXT PRIMARY KEY
+	first_name TEXT,
+	second_name TEXT,
+	email, TEXT
+
+INSERT INTO students
+	(fn, first_name,second_name)
+	VALUES("80412"
+
+
+
+Junction Table:
+FK : FK
+_____________
+|s_id | c_id|
+____________|
+
+
+
+

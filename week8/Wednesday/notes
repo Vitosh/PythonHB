@@ -1,0 +1,10 @@
+.read
+.tables
+.schema
+
+pip install requitements.txt
+grep "checker"
+
+wc -l counts lines
+python3.4 collector.py dbout " | grep "Outbound" | wc -l 
+

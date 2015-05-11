@@ -1,0 +1,6 @@
+watch python3.4 [programTests]
+
+Move db structure and create statements in .sql file
+Move db settings to settings.py
+Add CliInterface class to clean start.py
+Make exit command to work

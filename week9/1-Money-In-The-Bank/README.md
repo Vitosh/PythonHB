@@ -1,4 +1,4 @@
-#Note:
+##Note:
 ```If you want to make the program run, rename the file "sample_settings.py" to "settings.py" and enter a mail and a password for which you would like to send the mails. I am using yahoo.com.```
 
 

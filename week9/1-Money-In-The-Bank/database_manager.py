@@ -1,4 +1,4 @@
-from Client import Client
+from client import Client
 import sqlite3
 import create_db
 from settings import DB_NAME
@@ -29,10 +29,17 @@ class BankDatabaseManager():
     def change_pass(self, new_pass, logged_user):
         if not BankDatabaseManager.check_password(new_pass, logged_user=logged_user):
             return
-        cursor = self.conn.cursor()
         new_pass = BankDatabaseManager.hash_password(new_pass)
         update_sql = "UPDATE clients SET password = ? WHERE id = ?"
-        cursor.execute(update_sql, (new_pass, logged_user.get_id()))
+        self.cursor.execute(update_sql, (new_pass, logged_user.get_id()))
+        self.conn.commit()
+
+    def set_pass_from_reset(self, username, new_password):
+
+        new_password = BankDatabaseManager.hash_password(new_password)
+
+        update_sql = "UPDATE clients SET password = ? WHERE username = ?"
+        self.cursor.execute(update_sql, (new_password, username))
         self.conn.commit()
 
     def register(self, username, password, mail):
@@ -46,6 +53,17 @@ class BankDatabaseManager():
         cursor.execute(insert_sql, (username, HashedPassword, mail))
         self.conn.commit()
         return True
+
+    def deposit(self, logged_user, sum):
+        select_query = "SELECT balance FROM clients WHERE id = ?"
+        self.cursor.execute(select_query, (logged_user.get_id(),))
+        current_balance = float(self.cursor.fetchone()[0])
+
+        total_money = float(current_balance + sum)
+        update_query = """UPDATE clients SET balance = ? WHERE id = ?"""
+        self.cursor.execute(update_query, (total_money, logged_user.get_id()))
+
+        self.conn.commit()
 
     def login(self, username, password):
         cursor = self.conn.cursor()
@@ -72,6 +90,7 @@ class BankDatabaseManager():
             return False
         if username != "":
             if username.lower() in password.lower():
+                print(sPasswordInUserName)
                 return False
         else:
             if logged_user.get_username().lower() in password.lower():
@@ -101,11 +120,9 @@ class BankDatabaseManager():
 
     def get_username_from_email(self, email):
         cursor = self.conn.cursor()
-        select_query = "SELECT id FROM clients WHERE mail = ?"
+        select_query = "SELECT username FROM clients WHERE mail = ?"
         cursor.execute(select_query, (email,))
-        user = cursor.fetchone()
+        user = cursor.fetchone()[0]
 
         if(user):
-            print("User name is {}".format(Client(user[0])))
-            return Client(user[0])
-
+            return (user)

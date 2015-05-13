@@ -17,26 +17,29 @@ def send_mail(username, password, mail=SMTP_USERNAME):
 
     Hello, {}!
     You have requested a password reset.
-    Please, go to function "reset password" and enter the following password for password: {}.
+    Please, enter the following password for password:
+    (between the ">>>" and the "<<<" signs below):
+
+
+    >>>{}<<<.
+
 
     Have a great day!
 
     Best Regards,
 
     Money-In-The-Bank Training Team
-
     """.format(username, password)
 
-    def send_email():
-        msg = MIMEText(co_msg)
-        msg['Subject'] = EMAIL_SUBJECT
-        msg['From'] = EMAIL_FROM
-        msg['To'] = EMAIL_TO
-        debuglevel = False
-        mail = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
-        mail.set_debuglevel(debuglevel)
-        mail.starttls()
-        mail.login(SMTP_USERNAME, SMTP_PASSWORD)
-        mail.sendmail(EMAIL_FROM, EMAIL_TO, msg.as_string())
-        print("A new mail has been generated and sent to {}.".format(EMAIL_TO))
-        mail.quit()
+    msg = MIMEText(co_msg)
+    msg['Subject'] = EMAIL_SUBJECT
+    msg['From'] = EMAIL_FROM
+    msg['To'] = EMAIL_TO
+    debuglevel = True
+    mail = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+    mail.set_debuglevel(debuglevel)
+    mail.starttls()
+    mail.login(SMTP_USERNAME, SMTP_PASSWORD)
+    mail.sendmail(EMAIL_FROM, EMAIL_TO, msg.as_string())
+    print("A new mail has been generated and sent to {}.".format(EMAIL_TO))
+    mail.quit()

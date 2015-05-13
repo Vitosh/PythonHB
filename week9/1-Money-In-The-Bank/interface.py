@@ -2,13 +2,14 @@ from database_manager import BankDatabaseManager
 from getpass import getpass
 from client import Client
 from mail import send_mail
+from settings import LOGIN_ATTEMPTS
 
 
 class CliInterface():
 
     def __init__(self):
-        self.__manager = BankDatabaseManager()
-        self.WrongPasswordAttempts = 2
+        self.manager = BankDatabaseManager()
+        self.WrongPasswordAttempts = LOGIN_ATTEMPTS
 
     def command_dispatcher(self, command):
         if command == "register":
@@ -27,14 +28,25 @@ class CliInterface():
     def reset_password(self):
         email = input("Enter your e-mail for password reset:")
         newPassword = Client.generate_random_password()
-        hashNewPassword = self.__manager.hash_password(newPassword)
-        if (self.__manager.update_hash_password(email, hashNewPassword)):
-            # for testing purposes, the only e-mail that may receive mails is my e-mail.
+        hashNewPassword = self.manager.hash_password(newPassword)
+        if (self.manager.update_hash_password(email, hashNewPassword)):
+            # for testing purposes, the only e-mail that may receive mails is my e-mail,
+            # which is hidden in the settings folder ...
             # You may change it by adding "email" at the end of the send_mail()
             # parameters.
-            username = self.__manager.get_username_from_email()
-            send_mail(username, hash_password)
+
+            username = self.manager.get_username_from_email(email)
+            send_mail(username, hashNewPassword)
             print("Password request has been made.")
+            hash_code = input(
+                "Wait a little to receive the mail from us and enter the code here:")
+            if (hash_code == hashNewPassword):
+                new_password = getpass(
+                    prompt="Enter your new password here: ", stream=None)
+                self.manager.set_pass_from_reset(username, new_password)
+                print("Your new password has been generated.")
+            else:
+                print("Try again to reset!")
 
     def not_valid(self):
         print("Not a valid command.\nTry again.")
@@ -45,7 +57,7 @@ class CliInterface():
 
     def start(self):
         print(
-            """Welcome to our bank service. You are not logged in. \n Please register or login""")
+            """\n\n\n****BANK INTERNATIONAL****\n\n\nWelcome to our bank service. You are not logged in. \nPlease register or login:""")
         while True:
             command = input("Enter a command:")
             self.command_dispatcher(command)
@@ -59,11 +71,11 @@ class CliInterface():
         username = input("Enter your username: ")
         password = getpass(prompt="Enter your password: ", stream=None)
 
-        logged_user = self.__manager.login(username, password)
+        logged_user = self.manager.login(username, password)
 
         if logged_user:
             self.logged_menu(logged_user)
-            self.WrongPasswordAttempts = 5
+            self.WrongPasswordAttempts = LOGIN_ATTEMPTS
         else:
             print("Login failed")
             if (self.WrongPasswordAttempts > 1):
@@ -73,19 +85,19 @@ class CliInterface():
             else:
                 print("Are you human or are you robot? :)")
                 print("Database is locked for 10 seconds. Enjoy your day!")
-                self.__manager.lock_database()
+                self.manager.lock_database()
 
     def register(self):
         username = input("Enter your username: ")
         password = getpass(prompt="Enter your password: ", stream=None)
         mail = input("Enter your mail: ")
 
-        if (self.__manager.register(username, password, mail)):
+        if (self.manager.register(username, password, mail)):
             print("Registration Successfull")
         else:
             print("Registration failed.")
 
-    def __logged_dispatcher(self, command, logged_user):
+    def logged_dispatcher(self, command, logged_user):
 
         if command == 'info':
             self.logged_info(logged_user)
@@ -103,8 +115,19 @@ class CliInterface():
 
         elif command == 'close':
             self.exit_program()
+        elif command == "deposit":
+            self.logged_deposit(logged_user)
+        elif command == "withdraw":
+            pass
+        elif command == "display":
+            pass
         else:
             self.not_valid()
+
+    def logged_deposit(self, logged_user):
+        sum = float(input("Enter integer money to deposit."))
+        self.manager.deposit(logged_user, sum)
+        print("The sum {} has been deposited.".format(sum))
 
     def logged_info(self, logged_user):
         print("You are: " + logged_user.get_username())
@@ -114,11 +137,11 @@ class CliInterface():
 
     def logged_changepass(self, logged_user):
         new_pass = getpass(prompt="Enter your new password: ", stream=None)
-        self.__manager.change_pass(new_pass, logged_user)
+        self.manager.change_pass(new_pass, logged_user)
 
     def logged_change_message(self, logged_user):
         new_message = input("Enter your new message: ")
-        self.__manager.change_message(new_message, logged_user)
+        self.manager.change_message(new_message, logged_user)
 
     def logged_show_message(self, logged_user):
         print(logged_user.get_message())
@@ -134,7 +157,14 @@ class CliInterface():
 
         while True:
             command = input("Logged>>\n Now enter a command:")
-            self.__logged_dispatcher(command, logged_user)
+            self.logged_dispatcher(command, logged_user)
 
-a = CliInterface()
-a.start()
+
+interface = CliInterface()
+interface.manager.register("Peter", "lalalaLALA123!@#1", "nomail@for.me")
+interface.manager.register("Jo", "lalalaLALA123!@#2", "jobanana500@yahoo.com")
+interface.manager.register("Atanas", "lalalaLALA123!@#3", "ihavenomail@al.so")
+interface.manager.register("Maria", "lalalaLALA123!@#4", "mymailis@sec.ret")
+logged_user = interface.manager.login("Jo", "lalalaLALA123!@#2")
+interface.logged_deposit(logged_user)
+interface.logged_menu(logged_user)

@@ -1,5 +1,5 @@
 ##Note:
-```If you want to make the program run, rename the file "sample_settings.py" to "settings.py" and enter a mail and a password for which you would like to send the mails. I am using yahoo.com.```
+```If you want to run the program, rename the file "sample_settings.py" to "settings.py" and enter a mail and a password for which you would like to send the mails. I am using yahoo.com. It is a good idea, to create a new mail account, as far as you should not trust other's people code like this :cactus: ```
 
 
 

@@ -10,7 +10,7 @@ class SqlManagerTests(unittest.TestCase):
     def setUp(self):
         create_db.generate_tables()
         self.newDB = BankDatabaseManager()
-        self.newDB.register('Tester', '123BatMAN!1')
+        self.newDB.register("Tester", "123BatMAN!1", "jobanana75@yahoo.com")
 
     def tearDown(self):
         self.newDB.cursor.execute('DROP TABLE clients')
@@ -19,9 +19,21 @@ class SqlManagerTests(unittest.TestCase):
     def tearDownClass(cls):
         os.remove(DB_NAME)
 
+    def test_mail(self):
+        self.newDB.cursor.execute(
+            """SELECT mail
+            FROM clients
+            where username = (?);
+            """, ("Tester", )
+        )
+        user_result = self.newDB.cursor.fetchone()
+        self.assertEqual(user_result[0], "jobanana75@yahoo.com")
+
+        # self.newDB.
+
     def test_register(self):
-        password = '123123BatMAN!1'
-        self.newDB.register('Dinko', password)
+        password = "123123BatMAN!1"
+        self.newDB.register("Dinko", password, "jobanana75@yahoo.com")
         password = self.newDB.hash_password(password)
 
         self.newDB.cursor.execute(
@@ -33,7 +45,8 @@ class SqlManagerTests(unittest.TestCase):
         self.assertEqual(users_count[0], 1)
 
     def test_name(self):
-        self.newDB.register('Peter', 'harrypotteralealeBatMAN!1')
+        self.newDB.register(
+            'Peter', 'harrypotteralealeBatMAN!1', "jobanana75@yahoo.com")
         self.newDB.cursor.execute(
             """SELECT username, password, balance, message
                FROM clients""")
@@ -50,7 +63,8 @@ class SqlManagerTests(unittest.TestCase):
         self.assertFalse(logged_user)
 
     def test_change_message(self):
-        logged_user = self.newDB.login('Tester', '123BatMAN!1')
+        logged_user = self.newDB.login(
+            "Tester", "123BatMAN!1")
         new_message = "podaivinototam"
         self.newDB.change_message(new_message, logged_user)
         self.assertEqual(logged_user.get_message(), new_message)

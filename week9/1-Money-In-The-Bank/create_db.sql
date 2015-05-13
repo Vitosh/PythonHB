@@ -5,4 +5,5 @@ CREATE TABLE clients(
                 username TEXT,
                 password TEXT,
                 balance REAL DEFAULT 0,
-                message TEXT)
+                message TEXT,
+                mail TEXT)

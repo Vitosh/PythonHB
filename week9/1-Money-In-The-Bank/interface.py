@@ -1,5 +1,6 @@
 from database_manager import BankDatabaseManager
 from getpass import getpass
+from Client import Client
 
 
 class CliInterface():
@@ -17,8 +18,18 @@ class CliInterface():
             self.info()
         elif command == "exit":
             self.exit_program()
+        elif command == "reset":
+            self.reset_password()
         else:
             self.not_valid()
+
+    def reset_password(self):
+        email = input("Enter your e-mail for password reset:")
+        newPassword = Client.generate_random_password()
+        hashNewPassword = self.__manager.hash_password(newPassword)
+        print(hashNewPassword)
+        if (self.__manager.update_hash_password(email, hashNewPassword)):
+            print("Password request has been made.")
 
     def not_valid(self):
         print("Not a valid command.\nTry again.")
@@ -61,9 +72,12 @@ class CliInterface():
     def register(self):
         username = input("Enter your username: ")
         password = getpass(prompt="Enter your password: ", stream=None)
+        mail = input("Enter your mail: ")
 
-        if (self.__manager.register(username, password)):
+        if (self.__manager.register(username, password, mail)):
             print("Registration Successfull")
+        else:
+            print("Registration failed.")
 
     def __logged_dispatcher(self, command, logged_user):
 

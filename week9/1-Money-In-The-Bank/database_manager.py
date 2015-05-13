@@ -20,6 +20,12 @@ class BankDatabaseManager():
         self.conn.commit()
         logged_user.set_message(new_message)
 
+    def update_hash_password(self, email, hashed_password):
+        update_sql = "UPDATE clients SET password = ? WHERE mail = ?"
+        self.cursor.execute(update_sql, (email, hashed_password))
+        self.conn.commit()
+        return True
+
     def change_pass(self, new_pass, logged_user):
         if not BankDatabaseManager.check_password(new_pass, logged_user=logged_user):
             return
@@ -29,15 +35,15 @@ class BankDatabaseManager():
         cursor.execute(update_sql, (new_pass, logged_user.get_id()))
         self.conn.commit()
 
-    def register(self, username, password):
+    def register(self, username, password, mail):
         if not BankDatabaseManager.check_password(password, username=username):
             return False
-
+            print("something broke 1")
         HashedPassword = BankDatabaseManager.hash_password(password)
 
         cursor = self.conn.cursor()
-        insert_sql = "insert into clients (username, password) values (?, ?)"
-        cursor.execute(insert_sql, (username, HashedPassword))
+        insert_sql = "insert into clients (username, password, mail) values (?, ?, ?)"
+        cursor.execute(insert_sql, (username, HashedPassword, mail))
         self.conn.commit()
         return True
 
@@ -45,13 +51,13 @@ class BankDatabaseManager():
         cursor = self.conn.cursor()
         HashedPassword = BankDatabaseManager.hash_password(password)
 
-        select_query = "SELECT id, username, balance, message FROM clients WHERE username = ? AND password = ? LIMIT 1"
+        select_query = "SELECT id, username, balance, message, mail FROM clients WHERE username = ? AND password = ? LIMIT 1"
 
         cursor.execute(select_query, (username, HashedPassword))
         user = cursor.fetchone()
 
         if(user):
-            return Client(user[0], user[1], user[2], user[3])
+            return Client(user[0], user[1], user[2], user[3], user[4])
         else:
             return False
 

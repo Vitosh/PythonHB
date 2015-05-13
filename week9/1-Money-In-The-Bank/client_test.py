@@ -1,6 +1,6 @@
 import unittest
 
-from Client import Client
+from client import Client
 
 
 class ClientTests(unittest.TestCase):

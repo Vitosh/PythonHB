@@ -9,8 +9,12 @@ def send_mail(username, password, mail=SMTP_USERNAME):
     SMTP_PORT = 587
     EMAIL_FROM = SMTP_USERNAME
     EMAIL_TO = mail
-    EMAIL_SUBJECT = "Password reset Money-In-The-Bank Project"
+    EMAIL_SUBJECT = "Test Mail - Password reset Money-In-The-Bank Project"
     co_msg = """
+    Disclaimer:
+    Please, consider this mail just a test mail with educational purposes, if by any mistake you receive it. Simply delete it.
+    I am sorry! :)
+
     Hello, {}!
     You have requested a password reset.
     Please, go to function "reset password" and enter the following password for password: {}.
@@ -19,11 +23,7 @@ def send_mail(username, password, mail=SMTP_USERNAME):
 
     Best Regards,
 
-    Money-In-The-Bank Team
-
-    Disclaimer:
-    Please, consider this mail just a test mail with educational purposes, if by any mistake you receive it. Simply delete it.
-    I am sorry! :)
+    Money-In-The-Bank Training Team
 
     """.format(username, password)
 

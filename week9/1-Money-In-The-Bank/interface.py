@@ -1,6 +1,7 @@
 from database_manager import BankDatabaseManager
 from getpass import getpass
-from Client import Client
+from client import Client
+from mail import send_mail
 
 
 class CliInterface():
@@ -9,7 +10,7 @@ class CliInterface():
         self.__manager = BankDatabaseManager()
         self.WrongPasswordAttempts = 2
 
-    def __command_dispatcher(self, command):
+    def command_dispatcher(self, command):
         if command == "register":
             self.register()
         elif command == "login":
@@ -27,8 +28,12 @@ class CliInterface():
         email = input("Enter your e-mail for password reset:")
         newPassword = Client.generate_random_password()
         hashNewPassword = self.__manager.hash_password(newPassword)
-        print(hashNewPassword)
         if (self.__manager.update_hash_password(email, hashNewPassword)):
+            # for testing purposes, the only e-mail that may receive mails is my e-mail.
+            # You may change it by adding "email" at the end of the send_mail()
+            # parameters.
+            username = self.__manager.get_username_from_email()
+            send_mail(username, hash_password)
             print("Password request has been made.")
 
     def not_valid(self):
@@ -43,7 +48,7 @@ class CliInterface():
             """Welcome to our bank service. You are not logged in. \n Please register or login""")
         while True:
             command = input("Enter a command:")
-            self.__command_dispatcher(command)
+            self.command_dispatcher(command)
 
     def info(self):
         print("login - for logging in!")
@@ -63,7 +68,8 @@ class CliInterface():
             print("Login failed")
             if (self.WrongPasswordAttempts > 1):
                 self.WrongPasswordAttempts -= 1
-                print("You have {} tries left".format(self.WrongPasswordAttempts))
+                print(
+                    "You have {} tries left".format(self.WrongPasswordAttempts))
             else:
                 print("Are you human or are you robot? :)")
                 print("Database is locked for 10 seconds. Enjoy your day!")

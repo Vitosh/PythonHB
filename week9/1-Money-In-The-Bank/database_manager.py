@@ -98,3 +98,14 @@ class BankDatabaseManager():
             print("{} minutes to unlocking!".format(z))
             z -= 1
         print("Database is now unlocked! Good luck!")
+
+    def get_username_from_email(self, email):
+        cursor = self.conn.cursor()
+        select_query = "SELECT id FROM clients WHERE mail = ?"
+        cursor.execute(select_query, (email,))
+        user = cursor.fetchone()
+
+        if(user):
+            print("User name is {}".format(Client(user[0])))
+            return Client(user[0])
+

@@ -1,0 +1,61 @@
+Django + server deployment
+scp - secure copy protocol
+
+ORM
+- Data mapper
+- Active record
+
+> SQL & things that take care of the data.
+> Console interface:
+- reads and writes
+- implements logic
+- changes data
+
+How to create a program (MVC - model view controller):
+1. Start.py creates a db and gives it to SQL manager. Thus it is easy for testing, as far as it does not create it.Dependency injection.
+2. Start.py gives instance of the SQL to the manager. Dependency injection again.
+
+>>> SQL manager (Model in MVC)
+
+>>> Abstract Interface. (Controller in MVC) Business logics is set there.
+Started by start, 
+Manager is injected
+Has list Students. Returns [students]. Can show it as string. (with __str__ or __repr__)
+
+>>> Console Interface (Viewer in MVC)
+Started by start,
+Abstract interface is injected,
+- reads commands;
+- asks abstract interface;
+- print and format;
+- calls list Students from Abstract Interface;
+
+>>> start.py (manage.py entry point in MVC)
+
+
+_____________
+How does it work:
+
+1. A request is carried out in the view
+2. View tells the controller.
+3. Controller asks the model.
+4. Controller gets the return from the model and transforms it.
+5. View gets the return from the controller and paints it.
+
+_____________
+Django:
+MVT - model, view(controller), template (view)
+
+–––––––––––––
+ORM 
+- Data mapper
+- Active Record
+
+Data mapper writes clear Python classes
+Someone else maps them to SQL
+
+Active Record - classes know fo the DB.
+
+- class - names and types - declarative DB;
+- engine - ties DB and creates tables;
+- session - takes instances and takes care of them;

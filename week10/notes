@@ -1,0 +1,58 @@
+django-admin.py startproject cinema
+python manage.py startapp website
+
+to include app: in settings.py add:
+'website',
+on line 41 (INSTALLED_APPS) -> new line with a comma
+
+main app with the name of the project.
+Project cinema, main app - cinema as well.
+
+a view should have one argument, named request:
+def home(request):
+   pass
+What a view can do?
+-> return HTML
+-> requests DB
+
+python manage.py makemigrations
+What does it do:
+    goes around all apps
+    goes in the models.py and looks for a change
+    if TRUE:
+        creates a migration file, to make the changes in the DB
+
+python manage.py migrate
+
+in every app we have admin.py file. We describe the admin panel there.
+".models" means - from the current app, find the file models.py.
+
+Generating admin panel:
+admin.site.register(Movie) 
+
+python manage.py createsuperuser
+
+
+python manage.py runserver
+localhost:8000
+website is the name
+python3.4 manage.py startapp website
+python manage.py makemigrations
+python3.4 manage.py migrate
+
+INSTALLED_APPS = ""
+add every app at the end!
+
+
+<ul>
+{% for friend in friends %}
+	<li>{{ friend }}</li>
+{%endfor%}
+</ul>
+
+python3.4 manage.py shell
+>>>from website.models import Movie
+>>>m = Movie(name="Home", rating = 10.0)
+>>>m.save()
+
+python3.4 manage.py createsuperuser

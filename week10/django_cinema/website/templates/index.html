@@ -1,13 +1,28 @@
-<h1>All movies:</h1>
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+  <title></title>
+</head>
+<body>
+  <div class = "container"; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px;>
+  <h1>All movies:</h1>
+  {% for movie in movies %}
+  <blockquote>
+  <h2><a href="show_movie?movie_id={{ movie.id }}">{{ movie.name }}</a></h2>
 
-{% for movie in movies %}
-<h2><a href="show_movie?movie_id={{ movie.id }}">{{ movie.name }}</a></h2>
+      <p>Projections for that movie:</p>
 
-    <p>Projections for that movie:</p>
+      {% for projection in movie.projection_set.all %}
+        <h3>{{ projection }}</h3>
+      {% endfor %}
+  </blockquote>
+  {% endfor %}
+  <footer><a href= "http://www.vitoshacademy.com">My site!</a></footer>
+  </div>
 
-    {% for projection in movie.projection_set.all %}
-      <h3>{{ projection }}<h3/>
-    {% endfor %}
-{% endfor %}
+</body>
+</html>
+
 
 

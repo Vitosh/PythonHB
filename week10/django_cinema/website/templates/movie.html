@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <style type="text/css">
+      .btn {
+        background-color: hsl(193, 32%, 46%) !important;
+        background-repeat: repeat-x;
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#c2d9df", endColorstr="#4f8a9a");
+        background-image: -khtml-gradient(linear, left top, left bottom, from(#c2d9df), to(#4f8a9a));
+        background-image: -moz-linear-gradient(top, #c2d9df, #4f8a9a);
+        background-image: -ms-linear-gradient(top, #c2d9df, #4f8a9a);
+        background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%, #c2d9df), color-stop(100%, #4f8a9a));
+        background-image: -webkit-linear-gradient(top, #c2d9df, #4f8a9a);
+        background-image: -o-linear-gradient(top, #c2d9df, #4f8a9a);
+        background-image: linear-gradient(#c2d9df, #4f8a9a);
+        border-color: #4f8a9a #4f8a9a hsl(193, 32%, 37%);
+        color: #333 !important;
+        text-shadow: 0 1px 1px rgba(255, 255, 255, 0.59);
+        -webkit-font-smoothing: antialiased;
+      }
+    </style>
+    <title>My site</title>
+  </head>
+  <body>
+    <div class = "container"; padding-left: 15px; padding-right: 15px; padding-top: 15px; padding-bottom: 15px;>
+
+      <h1>{{ movie.name }}</h1>
+
+      <p>Movie id: {{ movie.id }}</p>
+      <p>Movie rating: {{ avg_rating }}</p>
+
+      <div>
+
+        <form method="POST" action="/rate_movie/">
+        {% csrf_token %}
+        <input name="movie_id" type="hidden" value="{{ movie.id }}" />
+          <div>
+            <label>Username:</label>
+            <input name="username" type="text" />
+          </div>
+          <div>
+            <label>Rating:</label>
+            <input name="rating" type="number" min="1" max="10" />
+          </div>
+        <input type="submit" class = "btn" value="Rate" />
+        </form>
+        <form action="/">
+        <input type="submit" class = "btn" value="Go back">
+        </form>
+        <footer><a href= "http://www.vitoshacademy.com" class = "btn">My site!</a></footer>
+      </div>
+    </div>
+  </body>
+</html>

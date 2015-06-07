@@ -3,10 +3,6 @@ import os
 from random import randint
 
 
-# for arg in sys.argv:
-#     print(arg)
-
-
 def main():
     for arg in sys.argv[1:]:
         filename = arg
@@ -50,15 +46,11 @@ def calculate():
 
 def fileSize():
     try:
-        total_size = 0
-        for dirpath, dirnames, filenames in os.walk(sys.argv[1]):
-            for f in filenames:
-                fp = os.path.join(dirpath, f)
-                total_size += os.path.getsize(fp)
-        print (total_size, " bits", sys.argv[1])
+        total_size = os.path.getsize(sys.argv[1])
+        print(total_size, " bits", sys.argv[1])
 
-    except FileNotFoundError as error:
-        print(error)
+    except OSError as e:
+        print("Error -> File name not correct")
 
 
 if __name__ == '__main__':

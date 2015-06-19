@@ -49,9 +49,9 @@ def fileSize():
         total_size = os.path.getsize(sys.argv[1])
         print(total_size, " bits", sys.argv[1])
 
-    except OSError as e:
+    except OSError:
         print("Error -> File name not correct")
 
 
 if __name__ == '__main__':
-    fileSize()
+    calculate()

@@ -11,7 +11,5 @@ def embedded_loops(index):
         for i in range(0, n):
             arr[index] = i
             embedded_loops(index+1)
-            
 
-        
 embedded_loops(0)
